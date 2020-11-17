@@ -8,28 +8,29 @@ interface CustomerListProps {
 }
 
 
+function addFieldCustomers(customers: any[]) {
+  return customers.map((item, index) => {
+
+    if (!item.lastDay) {
+      item.lastDay = ''
+    }
+    if (!item.invoiceNum) {
+      item.invoiceNum = ''
+    }
+    if (!item.message) {
+      item.message = ''
+    }
+    if (!item.refNum) {
+      item.refNum = ''
+    }
+    return item
+  })
+}
+
 const CustomerList: React.FC<CustomerListProps> = props => {
   const initialCustomers = addFieldCustomers(props.customers)
   const [customers, setCustomers] = useState(initialCustomers)
 
-  function addFieldCustomers(customers: any[]) {
-    return customers.map((item, index) => {
-
-      if (!item.lastDay) {
-        item.lastDay = ''
-      }
-      if (!item.invoiceNum) {
-        item.invoiceNum = ''
-      }
-      if (!item.message) {
-        item.message = ''
-      }
-      if (!item.refNum) {
-        item.refNum = ''
-      }
-      return item
-    })
-  }
 
   function onInputChange(value, colId, field) {
     if (!value.trim()) return
@@ -125,9 +126,9 @@ const CustomerList: React.FC<CustomerListProps> = props => {
         </tr>
         </thead>
         <tbody className="customerList__tbody">
-        {bodyTabList.map((item, index) => {
-          return <tr key={index} data-field-id={index}>{item}</tr>
-        })}
+          {bodyTabList.map((item, index) => {
+            return <tr key={index} data-field-id={index}>{item}</tr>
+          })}
         </tbody>
       </table>
     </div>
