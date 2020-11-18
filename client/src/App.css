@@ -26,6 +26,19 @@
 
 .table__wrapper {
   overflow: auto;
+  font-size: 13px;
+}
+
+.table__wrapper table {
+  table-layout: fixed;
+}
+
+.table__wrapper thead {
+  font-size: 10px;
+}
+
+.table__wrapper table input {
+  max-width: 120%;
 }
 
 .list__item {

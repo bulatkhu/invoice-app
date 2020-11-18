@@ -1,4 +1,3 @@
-// eslint-disable-next-line
 import {
   AlignmentType,
   Document,
@@ -13,10 +12,6 @@ import {
   TextRun,
   WidthType
 } from 'docx'
-// import {AlignmentType, Document, HeadingLevel, Packer, Paragraph, TabStopPosition, TabStopType, TextRun} from 'docx'
-// import { saveAs } from 'file-saver'
-
-const mockText = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut, cum.'
 
 
 const cellSettings = {
@@ -29,97 +24,7 @@ const cellSettings = {
   columnSpan: 1,
 }
 
-
-const table = new Table({
-  rows: [
-    new TableRow({
-      children: [
-        new TableCell({
-          children: [
-            new Paragraph('Laskun päiväys:'),
-            new Paragraph(new Date().toLocaleDateString()),
-          ],
-          ...cellSettings
-        }),
-        new TableCell({
-          width: {
-            size: '50%'
-          },
-          children: [
-            new Paragraph('Viivästyskorko:'),
-            new Paragraph('8 %'),
-          ],
-          ...cellSettings
-        }),
-      ],
-    }),
-    new TableRow({
-      children: [
-        new TableCell({
-          children: [
-            new Paragraph('Laskun numero:'),
-            new Paragraph('LASKUN NUMERO'),
-          ],
-          ...cellSettings
-        }),
-        new TableCell({
-          children: [
-            new Paragraph('Viitenumero:'),
-            new Paragraph('1 15235')
-          ],
-          ...cellSettings
-        }),
-      ],
-    }),
-    new TableRow({
-      children: [
-        new TableCell({
-          children: [
-            new Paragraph('Sukunimi:'),
-            new Paragraph('Asiakkaan sukunimi')
-          ],
-          ...cellSettings
-        }),
-        new TableCell({
-          children: [
-            new Paragraph('Etunimi:'),
-            new Paragraph('Asiakkaan etunimi')
-          ],
-          ...cellSettings,
-        }),
-      ],
-    }),
-    new TableRow({
-      children: [
-        new TableCell({
-          children: [
-            new Paragraph('Lähiosoite:'),
-            new Paragraph('Asiakkaan lähiosoite')
-          ],
-          ...cellSettings
-        }),
-        new TableCell({
-          children: [
-            new Paragraph('Postinumero:'),
-            new Paragraph('Asiakkaan postinumero')
-          ],
-          ...cellSettings
-        }),
-      ],
-    }),
-    new TableRow({
-      children: [
-        new TableCell({
-          children: [
-            new Paragraph('Laskun viesti:'),
-            new Paragraph(mockText),
-          ],
-          ...cellSettings,
-          columnSpan: 2
-        })
-      ]
-    })
-  ],
+const sideTableSettings = {
   float: {
     relativeHorizontalPosition: RelativeHorizontalPosition.RIGHT
   },
@@ -128,177 +33,288 @@ const table = new Table({
     type: WidthType.PERCENTAGE,
   },
   columnWidths: [500, 500, 500, 500],
-});
+}
 
-const bottomTable = new Table({
-  rows: [
-    new TableRow({
+
+function createCellForTable(data) {
+  return data.map(parag => new TableCell({
+    children: parag.map(text => new Paragraph(text)),
+    ...cellSettings
+  }))
+}
+
+
+export class docCreator {
+  nimi: any;
+  sukunimi: any;
+  puhelin: any;
+  lähiosoite: any;
+  postinumero: any;
+  postitoimipaikka: any;
+  eräpäivä: any;
+  sähköposti: any;
+  tilinumero: any;
+  viitenumero: any;
+  laskunviesti: any;
+  sum: any
+
+  constructor({sum, nimi, sukunimi, puhelin, lähiosoite, postinumero, postitoimipaikka, sähköposti, eräpäivä, tilinumero, laskunviesti, viitenumero}) {
+    this.nimi = nimi
+    this.sukunimi = sukunimi
+    this.puhelin = puhelin
+    this.lähiosoite = lähiosoite
+    this.postinumero = postinumero
+    this.postitoimipaikka = postitoimipaikka
+    this.sähköposti = sähköposti
+    this.eräpäivä = eräpäivä
+    this.tilinumero = tilinumero
+    this.laskunviesti = laskunviesti
+    this.viitenumero = viitenumero
+    this.sum = sum
+
+
+    // this.
+
+  }
+
+  createDoc() {
+
+    const doc = new Document()
+
+    doc.addSection({
       children: [
-        new TableCell({
-          children: [
-            new Paragraph('IBAN:'),
-            new Paragraph('FI2131023001230213'),
-          ],
-          ...cellSettings,
-        }),
-        new TableCell({
-          children: [
-            new Paragraph('BIC/SWIFT:'),
-            new Paragraph('OKOYFIHH'),
-          ],
-          ...cellSettings,
-        }),
-        new TableCell({
-          children: [
-            new Paragraph('Eräpäivä:'),
-            new Paragraph('17.11.20'),
-          ],
-          ...cellSettings,
-        })
-      ]
-    }),
-    new TableRow({
-      children: [
-        new TableCell({
-          children: [
-            new Paragraph('Viitenumero:'),
-            new Paragraph('100 02123'),
-          ],
-          ...cellSettings,
-        }),
-        new TableCell({
-          children: [
-            new Paragraph('Yhteensä EUR:'),
-            new Paragraph('266,80'),
-          ],
-          ...cellSettings,
-          columnSpan: 2
-        })
+        this.pageTitle('Lasku faktura'),
+        this.aboutCompany('Espoon seudun koulutuskuntayhtymä Omnia'),
+        this.customerData(this.nimi, this.sukunimi),
+        this.sideTable(),
+        this.bottomTable()
       ],
-    }),
-    new TableRow({
-      children: [
-        new TableCell({
-          children: [
-            new Paragraph('Laskuttava Yritys Oy:'),
-            new Paragraph('Laskuttajantie 10'),
-            new Paragraph('123456 Laskuttajankaupunki'),
-          ],
-          ...cellSettings,
-        }),
-        new TableCell({
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun('Y-tunnus:'),
-                new TextRun(' - '),
-                new TextRun('1234567-8:'),
-              ],
-              tabStops: [
-                {
-                  type: TabStopType.CENTER,
-                  position: 2268,
-                },
-              ],
-            }),
-            new Paragraph({
-              children: [
-                new TextRun('Puhelin:'),
-                new TextRun(' - '),
-                new TextRun('040123456'),
-              ],
-              tabStops: [
-                {
-                  type: TabStopType.CENTER,
-                  position: 2268,
-                },
-              ],
-            }),
-            new Paragraph({
-              children: [
-                new TextRun('Sähköposti:'),
-                new TextRun(' - '),
-                new TextRun('sähköposti@osoite.com'),
-              ],
-              tabStops: [
-                {
-                  type: TabStopType.RIGHT,
-                  position: 2268,
-                },
-              ],
-            }),
-          ],
-          ...cellSettings,
-          columnSpan: 2
-        })
-      ],
-    })
-  ],
-  float: {
-    relativeHorizontalPosition: RelativeHorizontalPosition.CENTER,
-    relativeVerticalPosition: RelativeVerticalPosition.BOTTOM
-  },
-  width: {
-    size: 100,
-    type: WidthType.PERCENTAGE,
-  },
-  columnWidths: [500, 500, 500],
-})
-
-const paragraph = new Paragraph({
-  children: [
-    new TextRun({
-      text: 'Lasku faktura',
-      allCaps: true,
-      bold: true
-    }),
-  ],
-  alignment: AlignmentType.CENTER,
-});
-
-const paragraph2 = new Paragraph({
-  children: [
-    new TextRun({
-      text: 'Yrityksen nimi ja osoite OY',
-    }),
-  ],
-  tabStops: [
-    {
-      type: TabStopType.CENTER,
-      position: 2268,
-    },
-  ],
-});
-
-const paragraph3 = new Paragraph({
-  children: [
-    new TextRun({
-      text: 'Sukunimi ja etunimi',
-    }),
-  ],
-  tabStops: [
-    {
-      type: TabStopType.CENTER,
-      position: 2268,
-    },
-  ],
-});
+    });
 
 
-export function docCreator() {
-  const doc = new Document()
+    return Packer.toBlob(doc)
 
-  doc.addSection({
+  }
+
+
+  public pageTitle = text => new Paragraph({
     children: [
-      // header, header,
-      paragraph,
-      paragraph2,
-      paragraph3,
-      table,
-      bottomTable
+      new TextRun({
+        text, allCaps: true,
+        bold: true
+      }),
+    ],
+    alignment: AlignmentType.CENTER,
+  });
+
+  public aboutCompany = (text = 'Yrityksen nimi ja osoite OY') =>  new Paragraph({
+    children: [
+      new TextRun({
+        text
+      }),
+    ],
+    tabStops: [
+      {
+        type: TabStopType.CENTER,
+        position: 2268,
+      },
     ],
   });
 
+  public customerData = (nimi, sukunimi) => new Paragraph({
+    children: [
+      new TextRun({
+        text: `${nimi} ${sukunimi}`,
+      }),
+    ],
+    tabStops: [
+      {
+        type: TabStopType.CENTER,
+        position: 2268,
+      },
+    ],
+  });
 
-  return Packer.toBlob(doc)
+  public bottomTable = () => new Table({
+    rows: [
+      new TableRow({
+        children: [
+          ...createCellForTable([
+            ['IBAN:', 'FI2131023001230213'],
+            ['BIC/SWIFT:', 'OKOYFIHH'],
+            ['Eräpäivä:', this.eräpäivä]
+          ])
+        ]
+      }),
+      new TableRow({
+        children: [
+          ...createCellForTable([
+            ['Viitenumero:', this.viitenumero],
+          ]),
+          new TableCell({
+            children: [
+              new Paragraph('Yhteensä EUR:'),
+              new Paragraph(this.sum.toString()),
+            ],
+            ...cellSettings,
+            columnSpan: 2
+          })
+        ],
+      }),
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [
+              new Paragraph('Laskuttava Yritys Oy:'),
+              new Paragraph('Laskuttajantie 10'),
+              new Paragraph('123456 Laskuttajankaupunki'),
+            ],
+            ...cellSettings,
+          }),
+          new TableCell({
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun('Y-tunnus:'),
+                  new TextRun(' - '),
+                  new TextRun('1234567-8:'),
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun('Puhelin:'),
+                  new TextRun(' - '),
+                  new TextRun('puhelinnumero'),
+                ],
+                tabStops: [
+                  {
+                    type: TabStopType.CENTER,
+                    position: 2268,
+                  },
+                ],
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun('Sähköposti:'),
+                  new TextRun(' - '),
+                  new TextRun(this.sähköposti),
+                ],
+                tabStops: [
+                  {
+                    type: TabStopType.RIGHT,
+                    position: 2268,
+                  },
+                ],
+              }),
+            ],
+            ...cellSettings,
+            columnSpan: 2
+          })
+        ],
+      })
+    ],
+    float: {
+      relativeHorizontalPosition: RelativeHorizontalPosition.CENTER,
+      relativeVerticalPosition: RelativeVerticalPosition.BOTTOM
+    },
+    width: {
+      size: 100,
+      type: WidthType.PERCENTAGE,
+    },
+    columnWidths: [500, 500, 500],
+  })
+
+  public sideTable = () => new Table({
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [
+              new Paragraph('Laskun päiväys:'),
+              new Paragraph(new Date().toLocaleDateString()),
+            ],
+            ...cellSettings
+          }),
+          new TableCell({
+            width: {
+              size: '50%'
+            },
+            children: [
+              new Paragraph('Viivästyskorko:'),
+              new Paragraph('8 %'),
+            ],
+            ...cellSettings
+          }),
+        ],
+      }),
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [
+              new Paragraph('Laskun numero:'),
+              new Paragraph('LASKUN NUMERO'),
+            ],
+            ...cellSettings
+          }),
+          new TableCell({
+            children: [
+              new Paragraph('Viitenumero:'),
+              new Paragraph(this.viitenumero)
+            ],
+            ...cellSettings
+          }),
+        ],
+      }),
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [
+              new Paragraph('Sukunimi:'),
+              new Paragraph(this.sukunimi)
+            ],
+            ...cellSettings
+          }),
+          new TableCell({
+            children: [
+              new Paragraph('Etunimi:'),
+              new Paragraph(this.nimi)
+            ],
+            ...cellSettings,
+          }),
+        ],
+      }),
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [
+              new Paragraph('Lähiosoite:'),
+              new Paragraph(this.lähiosoite)
+            ],
+            ...cellSettings
+          }),
+          new TableCell({
+            children: [
+              new Paragraph('Postinumero:'),
+              new Paragraph(this.postinumero)
+            ],
+            ...cellSettings
+          }),
+        ],
+      }),
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [
+              new Paragraph('Laskun viesti:'),
+              new Paragraph(this.laskunviesti),
+            ],
+            ...cellSettings,
+            columnSpan: 2
+          })
+        ]
+      })
+    ],
+    ...sideTableSettings
+  });
+
 }
