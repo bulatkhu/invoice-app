@@ -72,9 +72,15 @@ const CustomerList: React.FC<CustomerListProps> = props => {
 
   useEffect(() => {
 
+    setCustomers(addFieldCustomers(props.customers))
+
+  }, [props.customers])
+
+  useEffect(() => {
+
     const idArray = []
 
-    customers.forEach((item, index) => {
+    customers.forEach((item) => {
       const keys = Object.keys(item)
       const values = []
       keys.forEach(key => {
@@ -124,9 +130,9 @@ const CustomerList: React.FC<CustomerListProps> = props => {
     axios.post('/sendfile', formData)
       .then(res => {
         if (res.data.isSent) {
+          console.log('success', res.data)
 
           setCustomers(prevState => {
-
             return prevState.map((item, index) => {
 
               if (index === +res.data.index) {
@@ -142,7 +148,8 @@ const CustomerList: React.FC<CustomerListProps> = props => {
         }
       })
       .catch(err => {
-
+        alert('Error happened, email has been not sent, check console')
+        console.log(err)
       })
   }
 
@@ -208,16 +215,6 @@ const CustomerList: React.FC<CustomerListProps> = props => {
 
     const refNumVal = value.substring(0, 2) + value.substring(3, 5)
 
-    // setCustomers(prevState => {
-    //
-    //
-    //   return prevState.map(item => {
-    //     console.log(item)
-    //     return item
-    //   })
-    // })
-
-
     if (!value.toString().includes('_')) {
       return setCustomers(prevState => {
         return prevState.map((item, colId) => {
@@ -282,9 +279,7 @@ const CustomerList: React.FC<CustomerListProps> = props => {
             mask="99.99.9999"
             type="text"
             className="form-control"
-            // onChange={event => onInputChange(event.target.value, indexOfCol, key[index])}
             onChange={event => onChangeEverywhere(event.target.value, 'lastDay')}
-            // onChange={onChangeInput}
             placeholder="PP.KK.VVVV"
           />
         </div>
@@ -294,7 +289,8 @@ const CustomerList: React.FC<CustomerListProps> = props => {
           type="button"
           className="btn btn-success"
           onClick={() => onGenerateResults(customers)}
-        >Generate and download results of table</button>
+        >Generate and download results of table
+        </button>
       </div>
 
       <div className="table__wrapper">
@@ -307,53 +303,53 @@ const CustomerList: React.FC<CustomerListProps> = props => {
           <tbody className="customerList__tbody">
           {customers.map((itemObj, indexOfCol) => {
             const key = Object.keys(itemObj)
-            return Object.values(itemObj).map((item, index) => {
-
-
-              return (
-                <td data-id={index} data-field={key[index]} key={index}>
-                  <div>
-                    {
-                      key[index] !== 'lastDay'
-                        ? key[index] === 'refNum' || key[index] === 'isSent'
-                        ? <span className="list__item">{item}</span>
-                        : key[index] === 'docx'
-                          ? <>
-                            <button
-                              disabled={!showDocxInfo[indexOfCol]}
-                              type="button"
-                              className={['btn', 'btn-sm', !showDocxInfo[indexOfCol] ? 'btn-secondary' : 'btn-primary'].join(' ')}
-                              onClick={() => onClickGenDocx(indexOfCol, 'download')}
-                            >{item}</button>
-                            <button
-                              disabled={!showDocxInfo[indexOfCol]}
-                              type="button"
-                              className={['btn', 'btn-sm', !showDocxInfo[indexOfCol] ? 'btn-secondary' : 'btn-info'].join(' ')}
-                              onClick={() => onSendFile(indexOfCol)}
-                            >send
-                            </button>
-                          </>
-                          : <input
-                            onChange={event => onInputChange(event.target.value, indexOfCol, key[index])}
-                            data-field={key[index]}
-                            type="text"
-                            value={item.toString()}
-                          />
-                        : <InputMask
-                          mask="99.99.9999"
-                          type="text"
-                          onChange={event => onInputChange(event.target.value, indexOfCol, key[index])}
-                          data-field={key[index]}
-                          value={item.toString()}
-                          placeholder="PP.KK.VVVV"
-                        />
-                    }
-                  </div>
-                </td>
-              )
-            })
-          }).map((item, index) => {
-            return <tr key={index} data-field-id={index}>{item}</tr>
+            return (
+              <tr key={indexOfCol} data-field-id={indexOfCol}>{
+                Object.values(itemObj).map((item, index) => {
+                  return (
+                    <td data-id={index} data-field={key[index]} key={index}>
+                      <div>
+                        {
+                          key[index] !== 'lastDay'
+                            ? key[index] === 'refNum' || key[index] === 'isSent'
+                            ? <span className="list__item">{item}</span>
+                            : key[index] === 'docx'
+                              ? <>
+                                <button
+                                  disabled={!showDocxInfo[indexOfCol]}
+                                  type="button"
+                                  className={['btn', 'btn-sm', !showDocxInfo[indexOfCol] ? 'btn-secondary' : 'btn-primary'].join(' ')}
+                                  onClick={() => onClickGenDocx(indexOfCol, 'download')}
+                                >{item}</button>
+                                <button
+                                  disabled={!showDocxInfo[indexOfCol]}
+                                  type="button"
+                                  className={['btn', 'btn-sm', !showDocxInfo[indexOfCol] ? 'btn-secondary' : 'btn-info'].join(' ')}
+                                  onClick={() => onSendFile(indexOfCol)}
+                                >send
+                                </button>
+                              </>
+                              : <input
+                                onChange={event => onInputChange(event.target.value, indexOfCol, key[index])}
+                                data-field={key[index]}
+                                type="text"
+                                value={item.toString()}
+                              />
+                            : <InputMask
+                              mask="99.99.9999"
+                              type="text"
+                              onChange={event => onInputChange(event.target.value, indexOfCol, key[index])}
+                              data-field={key[index]}
+                              value={item.toString()}
+                              placeholder="PP.KK.VVVV"
+                            />
+                        }
+                      </div>
+                    </td>
+                  )
+                })
+              }</tr>
+            )
           })}
           </tbody>
         </table>

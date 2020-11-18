@@ -1,19 +1,19 @@
 const nodemailer = require('nodemailer')
-require('dotenv').config()
+// require('dotenv').config()
 
-module.exports = async function sendMail({file, message, name, lastname}) {
+module.exports = async function sendMail({file, message, name, lastname, email}) {
 
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL, // generated ethereal user
-      pass: process.env.PASSWORD, // generated ethereal password
+      user: process.env.EMAIL || 'hudainazarov.b@gmail.com', // generated ethereal user
+      pass: process.env.PASSWORD || '3004bulat', // generated ethereal password
     },
   });
 
-  const data = await transporter.sendMail({
+  return transporter.sendMail({
     from: 'Omnian ammattiopisto', // sender address
-    to: 'hudainazarov.b@yandex.ru', // list of receivers
+    to: email, // list of receivers
     subject: 'Lasku', // Subject line
     text: message, // plain text body
     html: `
@@ -26,7 +26,5 @@ module.exports = async function sendMail({file, message, name, lastname}) {
         content: Buffer.from(file.data, 'base64'),
       }
     ]
-  });
-
-  return data
+  })
 }

@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const _ = require('lodash')
 const app = express()
-const POST = 3001
+const POST = process.env.PORT = 3001
 const sendMail = require('./emailHandler')
 
 
@@ -40,8 +40,8 @@ app.post('/sendfile', (req, res) => {
       })
       .catch(err => {
         const error = JSON.parse(JSON.stringify(err))
-        console.log('err', error.response)
-        return res.json({...req.body, file, isSent: false, response: error.response})
+        console.log('err', error)
+        return res.json({...req.body, file, isSent: false, error})
       })
   } catch (e) {
     res.status(500).json({
@@ -52,6 +52,10 @@ app.post('/sendfile', (req, res) => {
   }
 
 })
+
+if (process.env.NODE_EVN === 'production') {
+  app.use(express.static('client/build'))
+}
 
 
 app.listen(POST, () => {
