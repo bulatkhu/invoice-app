@@ -6,8 +6,8 @@ module.exports = async function sendMail({file, message, name, lastname, email})
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL || 'hudainazarov.b@gmail.com', // generated ethereal user
-      pass: process.env.PASSWORD || '3004bulat', // generated ethereal password
+      user: process.env.EMAIL, // generated ethereal user
+      pass: process.env.PASSWORD, // generated ethereal password
     },
   });
 
